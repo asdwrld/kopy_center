@@ -1,0 +1,656 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4f7fb">
+<title>Копицентр — печать и копии</title>
+
+<style>
+:root {
+  --bg: #f4f7fb;
+  --white: #fff;
+  --blue: #244d70;
+  --text: #172b40;
+  --muted: #687b8e;
+  --line: #e2e9f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body.lock {
+  overflow: hidden;
+}
+
+.wrap {
+  width: min(1100px, calc(100% - 36px));
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.logo small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.top-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hero {
+  padding: 55px 0 25px;
+  max-width: 720px;
+}
+
+.eyebrow {
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+h1 {
+  font-size: clamp(36px, 6vw, 62px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin: 18px 0;
+}
+
+.hero p {
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.services {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  padding: 25px 0 40px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 22px;
+  padding: 25px;
+  min-height: 265px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: .25s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px #244d7012;
+}
+
+.card-icon {
+  font-size: 30px;
+  background: #eaf1f7;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+}
+
+.card h2 {
+  font-size: 24px;
+  margin: 25px 0 10px;
+}
+
+.card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.card-foot {
+  color: var(--blue);
+  font-weight: bold;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+.price-card {
+  background: var(--blue);
+  color: white;
+}
+
+.price-card p,
+.price-card .card-foot {
+  color: #d4e2ef;
+}
+
+.price-card .card-icon {
+  background: #ffffff20;
+}
+
+/* Рекламный баннер */
+
+.promo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  background: linear-gradient(110deg, white, #eaf2f9);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 25px;
+}
+
+.promo strong {
+  font-size: 14px;
+}
+
+.promo p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+.promo a {
+  background: var(--blue);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* Панели услуг */
+
+.panel {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--bg);
+  overflow-y: auto;
+  padding: 25px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: .3s;
+}
+
+.panel.open {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.panel-inner {
+  max-width: 850px;
+  margin: auto;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close {
+  border: 1px solid var(--line);
+  background: white;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.panel-content {
+  padding-top: 65px;
+}
+
+.panel h2 {
+  font-size: clamp(38px, 7vw, 68px);
+  letter-spacing: -2px;
+  margin: 15px 0;
+}
+
+.lead {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 35px;
+}
+
+.box {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 23px;
+}
+
+.box p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.action {
+  display: inline-block;
+  background: var(--blue);
+  color: white;
+  padding: 16px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.action.secondary {
+  background: white;
+  color: var(--blue);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.price-table {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 5px 22px;
+  margin-top: 30px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 0;
+}
+
+.price-row + .price-row {
+  border-top: 1px solid var(--line);
+}
+
+.price-row span {
+  color: var(--muted);
+}
+
+.price-row strong {
+  white-space: nowrap;
+}
+
+footer {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 0 30px;
+}
+
+@media (max-width: 750px) {
+  .services {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: 210px;
+  }
+
+  .hero {
+    padding-top: 35px;
+  }
+
+  .top-note {
+    display: none;
+  }
+
+  .promo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .promo a {
+    text-align: center;
+  }
+
+  .boxes {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .panel-content {
+    padding-top: 45px;
+  }
+
+  .action {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="logo">
+    КОПИЦЕНТР
+    <small>ПЕЧАТЬ · КОПИИ · ДОКУМЕНТЫ</small>
+  </div>
+  <div class="top-note">Понятно. Быстро. Аккуратно.</div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="eyebrow">НАШИ УСЛУГИ</div>
+  <h1>Документы —<br>без лишних сложностей.</h1>
+  <p>
+    Чёрно-белая распечатка и копирование документов.
+    Работаем по заявкам в Telegram.
+    Распечатка производится в комнате 414.
+  </p>
+</section>
+
+<section class="services">
+
+<button class="card" onclick="openPanel('print')">
+  <div class="card-icon">▤</div>
+  <div>
+    <h2>Распечатка</h2>
+    <p>Чёрно-белая печать документов формата А4.</p>
+  </div>
+  <div class="card-foot">Подробнее об услуге ↗</div>
+</button>
+
+<button class="card" onclick="openPanel('copies')">
+  <div class="card-icon">▧</div>
+  <div>
+    <h2>Копии документов</h2>
+    <p>Чёрно-белое копирование документов на А4.</p>
+  </div>
+  <div class="card-foot">Подробнее об услуге ↗</div>
+</button>
+
+<button class="card price-card" onclick="openPanel('price')">
+  <div class="card-icon">₽</div>
+  <div>
+    <h2>Прайс</h2>
+    <p>Актуальная стоимость услуг копицентра.</p>
+  </div>
+  <div class="card-foot">Посмотреть цены ↗</div>
+</button>
+
+</section>
+</main>
+
+<!-- Реклама -->
+
+<aside class="promo">
+  <div>
+    <strong>Нужен собственный сайт?</strong>
+    <p>Напишите — помогу с созданием сайта.</p>
+  </div>
+  <a href="https://t.me/youfanzon"
+     target="_blank"
+     rel="noopener noreferrer">
+    Написать @youfanzon ↗
+  </a>
+</aside>
+
+<footer>
+  <p><b>Чёрно-белая печать и копирование · Формат А4</b></p>
+  <p>© <span id="year"></span> Копицентр</p>
+</footer>
+
+</div>
+
+<!-- РАСПЕЧАТКА -->
+
+<section class="panel" id="print">
+  <div class="panel-inner">
+    <div class="panel-header">
+      <b>КОПИЦЕНТР</b>
+      <button class="close" onclick="closePanel()">×</button>
+    </div>
+
+    <div class="panel-content">
+      <div class="eyebrow">УСЛУГА 01</div>
+      <h2>Распечатка</h2>
+      <p class="lead">
+        Чёрно-белая печать документов формата А4.
+        Работаем по заявкам в Telegram.
+        Сначала согласуйте заказ, затем приходите
+        за распечаткой в комнату 414.
+      </p>
+
+      <div class="boxes">
+        <div class="box">
+          <h3>Что можно распечатать</h3>
+          <p>
+            Текстовые документы, учебные материалы
+            и другие файлы, подготовленные к печати.
+          </p>
+        </div>
+
+        <div class="box">
+          <h3>Где получить заказ</h3>
+          <p>
+            Распечатка производится в комнате 414.
+            Заказы принимаются по заявкам в Telegram.
+          </p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="action tg-link" href="https://t.me/">
+          Оставить заявку в Telegram ↗
+        </a>
+        <button class="action secondary" onclick="closePanel()">
+          Назад
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- КОПИИ -->
+
+<section class="panel" id="copies">
+  <div class="panel-inner">
+    <div class="panel-header">
+      <b>КОПИЦЕНТР</b>
+      <button class="close" onclick="closePanel()">×</button>
+    </div>
+
+    <div class="panel-content">
+      <div class="eyebrow">УСЛУГА 02</div>
+      <h2>Копии документов</h2>
+      <p class="lead">
+        Чёрно-белое копирование документов
+        на бумаге формата А4.
+        Работаем по заявкам в Telegram.
+      </p>
+
+      <div class="boxes">
+        <div class="box">
+          <h3>Для копирования</h3>
+          <p>
+            Подготовьте оригинал документа.
+            Проверьте, что текст и важные детали
+            хорошо видны.
+          </p>
+        </div>
+
+        <div class="box">
+          <h3>Есть вопросы?</h3>
+          <p>
+            Напишите нам, чтобы уточнить стоимость
+            и возможность выполнения заказа.
+          </p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="action tg-link" href="https://t.me/">
+          Оставить заявку в Telegram ↗
+        </a>
+        <button class="action secondary" onclick="closePanel()">
+          Назад
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ПРАЙС -->
+
+<section class="panel" id="price">
+  <div class="panel-inner">
+    <div class="panel-header">
+      <b>КОПИЦЕНТР</b>
+      <button class="close" onclick="closePanel()">×</button>
+    </div>
+
+    <div class="panel-content">
+      <div class="eyebrow">СТОИМОСТЬ УСЛУГ</div>
+      <h2>Прайс</h2>
+      <p class="lead">
+        Чёрно-белая печать А4.
+        Стоимость зависит от количества листов.
+      </p>
+
+      <div class="price-table">
+        <div class="price-row">
+          <span>А4, один лист</span>
+          <strong>8 ₽</strong>
+        </div>
+
+        <div class="price-row">
+          <span>А4, от 10 листов</span>
+          <strong>5 ₽ / лист</strong>
+        </div>
+      </div>
+
+      <p class="lead" style="font-size:13px">
+        Цена 5 ₽ за лист действует при заказе
+        от 10 листов. Стоимость копирования
+        уточните у сотрудника.
+      </p>
+
+      <div class="actions">
+        <a class="action tg-link" href="https://t.me/">
+          Уточнить / заказать ↗
+        </a>
+        <button class="action secondary" onclick="closePanel()">
+          Назад
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ВСТАВЬ СВОЮ ССЫЛКУ НА TELEGRAM
+const MESSENGER_URL = "https://t.me/Copy_center_bot";
+
+// Все кнопки заказа будут вести в Telegram
+document.querySelectorAll(".tg-link").forEach(link => {
+  link.href = MESSENGER_URL;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+});
+
+// Год внизу сайта
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+
+// Открытие услуги
+function openPanel(id) {
+  document.querySelectorAll(".panel").forEach(panel => {
+    panel.classList.remove("open");
+  });
+
+  document.getElementById(id).classList.add("open");
+  document.body.classList.add("lock");
+  history.replaceState(null, "", "#" + id);
+}
+
+// Закрытие услуги
+function closePanel() {
+  document.querySelectorAll(".panel").forEach(panel => {
+    panel.classList.remove("open");
+  });
+
+  document.body.classList.remove("lock");
+  history.replaceState(null, "", location.pathname + location.search);
+}
+
+// Закрытие клавишей Escape
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    closePanel();
+  }
+});
+
+// Открытие панели по ссылке с #print, #copies или #price
+const hash = location.hash.slice(1);
+
+if (["print", "copies", "price"].includes(hash)) {
+  openPanel(hash);
+}
+</script>
+
+</body>
+</html>
